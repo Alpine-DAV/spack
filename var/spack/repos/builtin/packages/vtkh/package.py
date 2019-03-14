@@ -86,8 +86,6 @@ class Vtkh(Package):
     depends_on("vtkm@master+cuda~tbb+openmp~shared", when="@develop+cuda+openmp~shared")
     depends_on("vtkm@master+cuda~tbb~openmp~shared", when="@develop+cuda~openmp~shared")
 
-    patch('vtkm_lagrange_cuda_fix.patch')
-
     def install(self, spec, prefix):
         with working_dir('spack-build', create=True):
             cmake_args = ["../src",
