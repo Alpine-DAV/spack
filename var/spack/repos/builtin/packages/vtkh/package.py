@@ -63,7 +63,7 @@ class Vtkh(Package):
     variant("cuda", default=False, description="build cuda support")
     variant("openmp", default=True, description="build openmp support")
 
-    depends_on("cmake@3.14.0", type='build')
+    depends_on("cmake@3.14.5", type='build')
 
     depends_on("mpi", when="+mpi")
     depends_on("intel-tbb", when="@0.1.0+tbb")
