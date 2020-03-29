@@ -5,6 +5,7 @@
 
 from spack import *
 
+
 class Babelflow(CMakePackage):
     """BabelFlow is an Embedded Domain Specific Language to describes
        algorithms using a task graph abstraction which allows them

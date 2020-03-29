@@ -5,14 +5,12 @@
 
 from spack import *
 
-import sys
 import os
 import socket
-import glob
-import shutil
 
 import llnl.util.tty as tty
 from os import environ as env
+
 
 def cmake_cache_entry(name, value, vtype=None):
     """
@@ -25,6 +23,7 @@ def cmake_cache_entry(name, value, vtype=None):
         else:
             vtype = "PATH"
     return 'set({0} "{1}" CACHE {2} "")\n\n'.format(name, value, vtype)
+
 
 class Dray(Package):
     """High-Order Mesh Ray Tracer."""
@@ -133,11 +132,6 @@ class Dray(Package):
         #######################
         c_compiler = env["SPACK_CC"]
         cpp_compiler = env["SPACK_CXX"]
-        f_compiler = None
-
-        if self.compiler.fc:
-            # even if this is set, it may not exist so do one more sanity check
-            f_compiler = env["SPACK_FC"]
 
         #######################################################################
         # By directly fetching the names of the actual compilers we appear
@@ -164,8 +158,8 @@ class Dray(Package):
             cmake_exe = cmake_exe.path
 
         host_cfg_fname = "%s-%s-%s-devil_ray.cmake" % (socket.gethostname(),
-                                                    sys_type,
-                                                    spec.compiler)
+                                                       sys_type,
+                                                       spec.compiler)
 
         cfg = open(host_cfg_fname, "w")
         cfg.write("##################################\n")
@@ -188,7 +182,6 @@ class Dray(Package):
         if "+mpi" in spec:
             mpicc_path = spec['mpi'].mpicc
             mpicxx_path = spec['mpi'].mpicxx
-            mpifc_path = spec['mpi'].mpifc
             # if we are using compiler wrappers on cray systems
             # use those for mpi wrappers, b/c  spec['mpi'].mpicxx
             # etc make return the spack compiler wrappers
@@ -196,8 +189,6 @@ class Dray(Package):
             if cpp_compiler == "CC":
                 mpicc_path = "cc"
                 mpicxx_path = "CC"
-                mpifc_path = "ftn"
-            #cfg.write(cmake_cache_entry("ENABLE_MPI", "ON"))
             cfg.write(cmake_cache_entry("CMAKE_C_COMPILER", mpicc_path))
             cfg.write(cmake_cache_entry("CMAKE_CXX_COMPILER", mpicxx_path))
         else:

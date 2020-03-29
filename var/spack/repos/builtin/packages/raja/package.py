@@ -48,7 +48,7 @@ class Raja(CMakePackage):
                 '-DENABLE_CUDA=On',
                 '-DCUDA_TOOLKIT_ROOT_DIR=%s' % (spec['cuda'].prefix)])
 
-         # shared vs static libs
+        # shared vs static libs
         if "+shared" in spec:
             options.append('-DBUILD_SHARED_LIBS=ON')
         else:

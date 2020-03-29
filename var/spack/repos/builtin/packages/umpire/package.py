@@ -69,7 +69,7 @@ class Umpire(CMakePackage):
         if '+numa' in spec:
             options.append('-DENABLE_NUMA=On')
 
-         # shared vs static libs
+        # shared vs static libs
         if "+shared" in spec:
             options.append('-DBUILD_SHARED_LIBS=ON')
         else:

@@ -41,8 +41,8 @@ class Ascent(Package, CudaPackage):
 
     #
     # develop is the viable build with the wired up dependencies
-    # We are working on a release. 
-    # 
+    # We are working on a release.
+    #
     version('develop',
             branch='develop',
             submodules=True,
@@ -78,7 +78,6 @@ class Ascent(Package, CudaPackage):
 
     # variant for BabelFlow runtime
     variant("babelflow", default=False, description="Build with BabelFlow")
-
 
     ###########################################################################
     # package dependencies
@@ -157,7 +156,6 @@ class Ascent(Package, CudaPackage):
     depends_on("dray@0.1.1~mpi~test~utils~shared+cuda",        when="+dray~mpi+cuda~shared")
     depends_on("dray@0.1.1~mpi~test~utils~shared+openmp",      when="+dray~mpi+openmp~shared")
     depends_on("dray@0.1.1~mpi~test~utils~shared~openmp~cuda", when="+dray~mpi~openmp~cuda~shared")
-
 
     #######################
     # Documentation related
@@ -441,7 +439,8 @@ class Ascent(Package, CudaPackage):
 
         if "+babelflow" in spec:
             cfg.write(cmake_cache_entry("ENABLE_BABELFLOW", "ON"))
-            cfg.write(cmake_cache_entry("BabelFlow_DIR", spec['babelflow'].prefix))
+            cfg.write(cmake_cache_entry("BabelFlow_DIR",
+                                        spec['babelflow'].prefix))
             cfg.write(cmake_cache_entry("PMT_DIR", spec['pmt'].prefix))
 
         #######################

@@ -22,7 +22,8 @@ class VtkM(CMakePackage, CudaPackage):
     git      = "https://gitlab.kitware.com/vtk/vtk-m.git"
 
     version('master', branch='master')
-    # Note: This is pre 1.5.2, we need for Ascent. It can be updated to actual release later
+    # TODO / Note: This is pre 1.5.2, we need for Ascent.
+    # It can be updated to actual release later
     version('1.5.2', commit="c49390f2537c5ba8cf25bd39aa5c212d6eafcf61")
     version('1.5.1', commit="124fb23c50c14b171ae91b27abca77c435968fa5")
     version('1.5.0', sha256="b1b13715c7fcc8d17f5c7166ff5b3e9025f6865dc33eb9b06a63471c21349aa8")
