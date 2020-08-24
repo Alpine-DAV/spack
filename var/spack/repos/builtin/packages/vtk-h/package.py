@@ -82,8 +82,7 @@ class VtkH(Package, CudaPackage):
     def install(self, spec, prefix):
         with working_dir('spack-build', create=True):
             host_cfg_fname = self.create_host_config(spec,
-                                                     prefix,
-                                                     py_site_pkgs_dir)
+                                                     prefix)
             cmake_args = []
             # if we have a static build, we need to avoid any of
             # spack's default cmake settings related to rpaths
@@ -109,7 +108,7 @@ class VtkH(Package, CudaPackage):
             # install copy of host config for provenance
             install(host_cfg_fname, prefix)
 
-    def create_host_config(self, spec, prefix, py_site_pkgs_dir=None):
+    def create_host_config(self, spec, prefix):
         """
         This method creates a 'host-config' file that specifies
         all of the options used to configure and build vtkh.
