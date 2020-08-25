@@ -90,14 +90,14 @@ class VtkH(Package, CudaPackage):
 
             # use release, instead of release with debug symbols b/c vtkh libs
             # can overwhelm compilers with too many symbols
-            std_cmake_args = [ arg for arg in std_cmake_args if arg.count("CMAKE_BUILD_TYPE") == 0 ]
-            std_cmake_args.append("-DCMAKE_BUILD_TYPE=Release")
-            if "+shared" in spec:
-                cmake_args.extend(std_cmake_args)
-            else:
-                for arg in std_cmake_args:
+            for arg in std_cmake_args:
+                if arg.count("CMAKE_BUILD_TYPE") == 0
+                    if "+shared" in spec:
+                        cmake_args.append(arg)
+                else:
                     if arg.count("RPATH") == 0:
                         cmake_args.append(arg)
+            cmake_args.append("-DCMAKE_BUILD_TYPE=Release")
             cmake_args.extend(["-C", host_cfg_fname, "../src"])
             print("Configuring VTK-h...")
             cmake(*cmake_args)
