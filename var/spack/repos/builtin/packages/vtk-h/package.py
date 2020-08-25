@@ -91,7 +91,7 @@ class VtkH(Package, CudaPackage):
             # use release, instead of release with debug symbols b/c vtkh libs
             # can overwhelm compilers with too many symbols
             for arg in std_cmake_args:
-                if arg.count("CMAKE_BUILD_TYPE") == 0
+                if arg.count("CMAKE_BUILD_TYPE") == 0:
                     if "+shared" in spec:
                         cmake_args.append(arg)
                 else:
