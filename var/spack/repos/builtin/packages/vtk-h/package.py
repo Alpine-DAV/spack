@@ -94,9 +94,9 @@ class VtkH(Package, CudaPackage):
                 if arg.count("CMAKE_BUILD_TYPE") == 0:
                     if "+shared" in spec:
                         cmake_args.append(arg)
-                else:
-                    if arg.count("RPATH") == 0:
-                        cmake_args.append(arg)
+                    else:
+                        if arg.count("RPATH") == 0:
+                            cmake_args.append(arg)
             cmake_args.append("-DCMAKE_BUILD_TYPE=Release")
             cmake_args.extend(["-C", host_cfg_fname, "../src"])
             print("Configuring VTK-h...")
