@@ -377,7 +377,7 @@ class Conduit(Package):
         if ((f_compiler is not None)
            and ("clang" in cpp_compiler)):
             libdir = os.path.join(os.path.dirname(
-                                  os.path.dirname(f_compiler)), "lib")
+                                  os.path.dirname(f_compiler.path)), "lib")
             flags = ""
             for _libpath in [libdir, libdir + "64"]:
                 if os.path.exists(_libpath):
