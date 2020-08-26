@@ -169,6 +169,23 @@ class VtkH(Package, CudaPackage):
                 cfg.write(cmake_cache_entry("BUILD_SHARED_LIBS", "OFF"))
 
         #######################################################################
+        # use global spack compiler flags
+        #######################################################################
+        cppflags = ' '.join(spec.compiler_flags['cppflags'])
+        if cppflags:
+            # avoid always ending up with ' ' with no flags defined
+            cppflags += ' '
+        cflags = cppflags + ' '.join(spec.compiler_flags['cflags'])
+        if cflags:
+            cfg.write(cmake_cache_entry("CMAKE_C_FLAGS", cflags))
+        cxxflags = cppflags + ' '.join(spec.compiler_flags['cxxflags'])
+        if cxxflags:
+            cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
+        fflags = ' '.join(spec.compiler_flags['fflags'])
+        if fflags:
+            cfg.write(cmake_cache_entry("CMAKE_Fortran_FLAGS", fflags))
+
+        #######################################################################
         # Options
         #######################################################################
         if "+test" in spec:
