@@ -551,7 +551,7 @@ class Conduit(Package):
 
         cfg.write("# h5z-zfp from spack \n")
 
-        if "+h5z-zfp" in spec:
+        if "+hdf5+zfp" in spec:
             cfg.write(cmake_cache_entry("H5ZZFP_DIR", spec['h5z-zfp'].prefix))
         else:
             cfg.write("# h5z-zfp not built by spack \n")
