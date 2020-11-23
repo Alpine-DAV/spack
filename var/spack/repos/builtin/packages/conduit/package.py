@@ -71,6 +71,7 @@ class Conduit(Package):
             description="Build Conduit with HDF5 1.8.x (compatibility mode)")
     variant("silo", default=False, description="Build Conduit Silo support")
     variant("adios", default=False, description="Build Conduit ADIOS support")
+    variant("adios2", default=False, description="Build Conduit ADIOS2 support")
 
     # zfp compression
     variant("zfp", default=False, description="Build Conduit ZFP support")
@@ -88,8 +89,8 @@ class Conduit(Package):
     #######################
     # CMake
     #######################
-    # cmake 3.8.2 or newer
-    depends_on("cmake@3.8.2:", type='build')
+    # cmake 3.14.1 or newer
+    depends_on("cmake@3.14.1:", type='build')
 
     #######################
     # Python
@@ -116,6 +117,8 @@ class Conduit(Package):
     depends_on("hdf5@1.8.19:1.8.999~shared~cxx", when="+hdf5+hdf5_compat~shared")
     depends_on("hdf5~cxx", when="+hdf5~hdf5_compat+shared")
     depends_on("hdf5~shared~cxx", when="+hdf5~hdf5_compat~shared")
+    # hdf5 zfp plugin when both are on
+    depends_on("h5z-zfp~fortran", when="+hdf5+zfp")
 
     ###############
     # Silo
@@ -132,10 +135,19 @@ class Conduit(Package):
     depends_on("adios~mpi~hdf5+shared",       when="+adios~mpi+shared")
     depends_on("adios~mpi~hdf5~shared~blosc", when="+adios~mpi~shared")
 
+    ###############
+    # ADIOS 2
+    ###############
+    depends_on("adios2+mpi~hdf5+shared",       when="+adios2+mpi+shared")
+    depends_on("adios2+mpi~hdf5~shared~blosc", when="+adios2+mpi~shared")
+    depends_on("adios2~mpi~hdf5+shared",       when="+adios2~mpi+shared")
+    depends_on("adios2~mpi~hdf5~shared~blosc", when="+adios2~mpi~shared")
+
+
     #######################
     # ZFP
     #######################
-    depends_on("zfp", when="+zfp")
+    depends_on("zfp  bsws=8", when="+zfp")
 
     #######################
     # MPI
