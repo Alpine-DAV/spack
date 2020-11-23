@@ -546,6 +546,17 @@ class Conduit(Package):
             cfg.write("# hdf5 not built by spack \n")
 
         #######################
+        # h5z-zfp
+        #######################
+
+        cfg.write("# h5z-zfp from spack \n")
+
+        if "+h5z-zfp" in spec:
+            cfg.write(cmake_cache_entry("H5ZZFP_DIR", spec['h5z-zfp'].prefix))
+        else:
+            cfg.write("# h5z-zfp not built by spack \n")
+
+        #######################
         # Silo
         #######################
 
