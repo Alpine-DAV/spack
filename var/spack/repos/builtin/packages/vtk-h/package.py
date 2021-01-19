@@ -194,11 +194,11 @@ class VtkH(Package, CudaPackage):
         # Options
         #######################################################################
         if "+test" in spec:
-            cfg.write(cmake_cache_entry("ENABLE_TESTS", "OFF"))
-            cfg.write(cmake_cache_entry("BUILD_TESTING", "OFF"))
-        else:
             cfg.write(cmake_cache_entry("ENABLE_TESTS", "ON"))
             cfg.write(cmake_cache_entry("BUILD_TESTING", "ON"))
+        else:
+            cfg.write(cmake_cache_entry("ENABLE_TESTS", "OFF"))
+            cfg.write(cmake_cache_entry("BUILD_TESTING", "OFF"))
 
         # logging
         if "+logging" in spec:
