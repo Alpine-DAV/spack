@@ -27,7 +27,7 @@ def cmake_cache_entry(name, value, vtype=None):
     return 'set({0} "{1}" CACHE {2} "")\n\n'.format(name, value, vtype)
 
 
-class Conduit(Package):
+class Conduit(CMakePackage):
     """Conduit is an open source project from Lawrence Livermore National
     Laboratory that provides an intuitive model for describing hierarchical
     scientific data in C++, C, Fortran, and Python. It is used for data
@@ -106,7 +106,7 @@ class Conduit(Package):
     ###############
     # HDF5
     ###############
-    # TODO: cxx variant is disabled due to build issue Cyrus
+    # Note: cxx variant is disabled due to build issue Cyrus
     # experienced on BGQ. When on, the static build tries
     # to link against shared libs.
     #
@@ -153,8 +153,10 @@ class Conduit(Package):
     # Cmake will support fj compiler and this patch will be removed
     patch('fj_flags.patch', when='%fj')
 
+    ###################################
     # build phases used by this package
-    phases = ["configure", "build", "install"]
+    ###################################
+    phases = ['hostconfig', 'cmake', 'build', 'install']
 
     def flag_handler(self, name, flags):
         if name in ('cflags', 'cxxflags', 'fflags'):
@@ -182,42 +184,16 @@ class Conduit(Package):
             return "https://github.com/LLNL/conduit/releases/download/v{0}/conduit-v{1}-src-with-blt.tar.gz".format(v, v)
         return url
 
-    def configure(self, spec, prefix):
-        """
-        Configure Conduit.
-        """
-        with working_dir('spack-build', create=True):
-            py_site_pkgs_dir = None
-            if "+python" in spec:
-                py_site_pkgs_dir = site_packages_dir
+    ####################################################################
+    # Note: cmake, build, and install stages are handled by CMakePackage
+    ####################################################################
 
-            host_cfg_fname = self.create_host_config(spec,
-                                                     prefix,
-                                                     py_site_pkgs_dir)
-            # save this filename for
-            # other package recipe steps to access
-            self.host_cfg_fname = host_cfg_fname
-            cmake_args = []
-            # if we have a static build, we need to avoid any of
-            # spack's default cmake settings related to rpaths
-            # (see: https://github.com/spack/spack/issues/2658)
-            if "+shared" in spec:
-                cmake_args.extend(std_cmake_args)
-            else:
-                for arg in std_cmake_args:
-                    if arg.count("RPATH") == 0:
-                        cmake_args.append(arg)
-            cmake_args.extend(["-C", host_cfg_fname, "../src"])
-            print("Configuring Conduit...")
-            cmake(*cmake_args)
-
-    def build(self, spec, prefix):
-        """
-        Build Conduit.
-        """
-        with working_dir('spack-build'):
-            print("Building Conduit...")
-            make()
+    # provide cmake args (pass host config as cmake cache file)
+    def cmake_args(self):
+        host_config = self._get_host_config_path(self.spec)
+        options = []
+        options.extend(['-C', host_config, "../spack-src/src/"])
+        return options
 
     @run_after('build')
     @on_package_attributes(run_tests=True)
@@ -226,15 +202,9 @@ class Conduit(Package):
             print("Running Conduit Unit Tests...")
             make("test")
 
-    def install(self, spec, prefix):
-        """
-        Install Conduit.
-        """
-        with working_dir('spack-build'):
-            make("install")
-            # install copy of host config for provenance
-            print("Installing Conduit CMake Host Config File...")
-            install(self.host_cfg_fname, prefix)
+    @run_after('install')
+    def install_cmake_cache(self):
+        install(self._get_host_config_path(self.spec), prefix)
 
     @run_after('install')
     @on_package_attributes(run_tests=True)
@@ -273,24 +243,31 @@ class Conduit(Package):
             example = Executable('./conduit_example')
             example()
 
-    def create_host_config(self, spec, prefix, py_site_pkgs_dir=None):
+    def _get_host_config_path(self, spec):
+        sys_type = spec.architecture
+        # if on llnl systems, we can use the SYS_TYPE
+        if "SYS_TYPE" in env:
+            sys_type = env["SYS_TYPE"]
+        host_config_path = "%s-%s-%s-conduit.cmake" % (socket.gethostname(),
+                                                       sys_type,
+                                                       spec.compiler)
+        dest_dir = self.stage.source_path
+        host_config_path = os.path.abspath(join_path(dest_dir,
+                                                     host_config_path))
+        return host_config_path
+
+    def hostconfig(self, spec, prefix):
         """
         This method creates a 'host-config' file that specifies
         all of the options used to configure and build conduit.
 
         For more details about 'host-config' files see:
             http://software.llnl.gov/conduit/building.html
-
-        Note:
-          The `py_site_pkgs_dir` arg exists to allow a package that
-          subclasses this package provide a specific site packages
-          dir when calling this function. `py_site_pkgs_dir` should
-          be an absolute path or `None`.
-
-          This is necessary because the spack `site_packages_dir`
-          var will not exist in the base class. For more details
-          on this issue see: https://github.com/spack/spack/issues/6261
         """
+
+        py_site_pkgs_dir = None
+        if "+python" in spec:
+            py_site_pkgs_dir = site_packages_dir
 
         #######################
         # Compiler Info
@@ -306,8 +283,7 @@ class Conduit(Package):
                 f_compiler  = env["SPACK_FC"]
 
         #######################################################################
-        # By directly fetching the names of the actual compilers we appear
-        # to doing something evil here, but this is necessary to create a
+        # Directly fetch the names of the actual compilers to create a
         # 'host config' file that works outside of the spack install env.
         #######################################################################
 
@@ -324,9 +300,9 @@ class Conduit(Package):
         ##############################################
 
         cmake_exe = spec['cmake'].command.path
-        host_cfg_fname = "%s-%s-%s-conduit.cmake" % (socket.gethostname(),
-                                                     sys_type,
-                                                     spec.compiler)
+
+        # get hostconfig name
+        host_cfg_fname = self._get_host_config_path(spec)
 
         cfg = open(host_cfg_fname, "w")
         cfg.write("##################################\n")
@@ -562,4 +538,3 @@ class Conduit(Package):
 
         host_cfg_fname = os.path.abspath(host_cfg_fname)
         tty.info("spack generated conduit host-config file: " + host_cfg_fname)
-        return host_cfg_fname
