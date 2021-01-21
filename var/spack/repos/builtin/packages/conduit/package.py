@@ -88,8 +88,8 @@ class Conduit(CMakePackage):
     #######################
     # CMake
     #######################
-    # cmake 3.8.2 or newer
-    depends_on("cmake@3.8.2:", type='build')
+    # cmake 3.14.1 or newer
+    depends_on("cmake@3.14.1:", type='build')
 
     #######################
     # Python
@@ -135,7 +135,10 @@ class Conduit(CMakePackage):
     #######################
     # ZFP
     #######################
-    depends_on("zfp", when="+zfp")
+    depends_on("zfp  bsws=8", when="+zfp")
+
+    # hdf5 zfp plugin when both hdf5 and zfp are on
+    depends_on("h5z-zfp~fortran", when="+hdf5+zfp")
 
     #######################
     # MPI
@@ -508,6 +511,17 @@ class Conduit(CMakePackage):
             cfg.write(cmake_cache_entry("HDF5_DIR", spec['hdf5'].prefix))
         else:
             cfg.write("# hdf5 not built by spack \n")
+
+        #######################
+        # h5z-zfp
+        #######################
+
+        cfg.write("# h5z-zfp from spack \n")
+
+        if "+hdf5+zfp" in spec:
+            cfg.write(cmake_cache_entry("H5ZZFP_DIR", spec['h5z-zfp'].prefix))
+        else:
+            cfg.write("# h5z-zfp not built by spack \n")
 
         #######################
         # Silo
