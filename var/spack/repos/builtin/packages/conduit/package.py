@@ -254,7 +254,10 @@ class Conduit(CMakePackage):
         host_config_path = "%s-%s-%s-conduit.cmake" % (socket.gethostname(),
                                                        sys_type,
                                                        spec.compiler)
-        dest_dir = self.stage.source_path
+        if "UBERENV_HOSTCONFIG_DEST_DIR" in os.environ.keys():
+            dest_dir = os.environ["UBERENV_HOSTCONFIG_DEST_DIR"]
+        else:
+            dest_dir = self.stage.source_path
         host_config_path = os.path.abspath(join_path(dest_dir,
                                                      host_config_path))
         return host_config_path
