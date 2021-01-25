@@ -35,15 +35,21 @@ class Ascent(Package, CudaPackage):
 
     homepage = "https://github.com/Alpine-DAV/ascent"
     git      = "https://github.com/Alpine-DAV/ascent.git"
-    url      = "https://github.com/Alpine-DAV/ascent/releases/download/v0.5.0/ascent-v0.5.0-src-with-blt.tar.gz"
+    url      = "https://github.com/Alpine-DAV/ascent/releases/download/v0.5.1/ascent-v0.5.1-src-with-blt.tar.gz"
 
     maintainers = ['cyrush']
 
     version('develop',
             branch='develop',
-            submodules=True)
+            submodules=True,
+            preferred=True)
 
-    version('0.5.0', sha256='2837b7371db3ac1bcc31a479d7cf0eb62a503cacadfa4187061502b3c4a89fa0')
+    # these are commented out b/c if they are active they undermine using develop
+    # but this only undermined us because 'preferred' was mispelled 'prefered',
+    # which now has been fixed
+    # develop uses the set of deps that we keep healthy
+    # version('0.5.1', sha256='6ad426d92a37dc9466e55e8c0cc5fccf02d0107d1035f8ee1c43fb1539592174')
+    # version('0.5.0', sha256='2837b7371db3ac1bcc31a479d7cf0eb62a503cacadfa4187061502b3c4a89fa0')
 
     ###########################################################################
     # package variants
@@ -68,9 +74,10 @@ class Ascent(Package, CudaPackage):
     variant("cuda", default=False, description="Build cuda support")
     variant("mfem", default=False, description="Build MFEM filter support")
     variant("adios", default=False, description="Build Adios filter support")
+    variant("dray", default=False, description="Build with Devil Ray support")
 
     # variants for dev-tools (docs, etc)
-    variant("doc", default=False, description="Build Conduit's documentation")
+    variant("doc", default=False, description="Build Ascent's documentation")
 
     # variant for BabelFlow runtime
     variant("babelflow", default=False, description="Build with BabelFlow")
@@ -116,24 +123,44 @@ class Ascent(Package, CudaPackage):
     # TPLs for Runtime Features
     #############################
 
-    depends_on("vtk-h@0.5.0",             when="+vtkh")
-    depends_on("vtk-h@0.5.0~openmp",      when="+vtkh~openmp")
-    depends_on("vtk-h@0.5.0+cuda+openmp", when="+vtkh+cuda+openmp")
-    depends_on("vtk-h@0.5.0+cuda~openmp", when="+vtkh+cuda~openmp")
+    depends_on("vtk-h",             when="+vtkh")
+    depends_on("vtk-h~openmp",      when="+vtkh~openmp")
+    depends_on("vtk-h+cuda+openmp", when="+vtkh+cuda+openmp")
+    depends_on("vtk-h+cuda~openmp", when="+vtkh+cuda~openmp")
 
-    depends_on("vtk-h@0.5.0~shared",             when="~shared+vtkh")
-    depends_on("vtk-h@0.5.0~shared~openmp",      when="~shared+vtkh~openmp")
-    depends_on("vtk-h@0.5.0~shared+cuda",        when="~shared+vtkh+cuda")
-    depends_on("vtk-h@0.5.0~shared+cuda~openmp", when="~shared+vtkh+cuda~openmp")
+    depends_on("vtk-h~shared",             when="~shared+vtkh")
+    depends_on("vtk-h~shared~openmp",      when="~shared+vtkh~openmp")
+    depends_on("vtk-h~shared+cuda",        when="~shared+vtkh+cuda")
+    depends_on("vtk-h~shared+cuda~openmp", when="~shared+vtkh+cuda~openmp")
 
     # mfem
-    depends_on("mfem+threadsafe+shared+mpi+conduit", when="+shared+mfem+mpi")
-    depends_on("mfem+threadsafe~shared+mpi+conduit", when="~shared+mfem+mpi")
+    depends_on("mfem@4.0.2~threadsafe~openmp+shared+mpi+conduit", when="+shared+mfem+mpi")
+    depends_on("mfem@4.0.2~threadsafe~openmp~shared+mpi+conduit", when="~shared+mfem+mpi")
 
-    depends_on("mfem+threadsafe+shared~mpi+conduit", when="+shared+mfem~mpi")
-    depends_on("mfem+threadsafe~shared~mpi+conduit", when="~shared+mfem~mpi")
+    depends_on("mfem@4.0.2~threadsafe~openmp+shared~mpi+conduit", when="+shared+mfem~mpi")
+    depends_on("mfem@4.0.2~threadsafe~openmp~shared~mpi+conduit", when="~shared+mfem~mpi")
 
     depends_on("adios", when="+adios")
+
+    # devil ray variants wit mpi
+    # we have to specify both because mfem makes us
+    depends_on("dray@develop+mpi~test~utils+shared+cuda",        when="+dray+mpi+cuda+shared")
+    depends_on("dray@develop+mpi~test~utils+shared+openmp",      when="+dray+mpi+openmp+shared")
+    depends_on("dray@develop+mpi~test~utils+shared~openmp~cuda", when="+dray+mpi~openmp~cuda+shared")
+
+    depends_on("dray@develop+mpi~test~utils~shared+cuda",        when="+dray+mpi+cuda~shared")
+    depends_on("dray@develop+mpi~test~utils~shared+openmp",      when="+dray+mpi+openmp~shared")
+    depends_on("dray@develop+mpi~test~utils~shared~openmp~cuda", when="+dray+mpi~openmp~cuda~shared")
+
+    # devil ray variadevelopithout mpi
+    depends_on("dray@develop~mpi~test~utils+shared+cuda",        when="+dray~mpi+cuda+shared")
+    depends_on("dray@develop~mpi~test~utils+shared+openmp",      when="+dray~mpi+openmp+shared")
+    depends_on("dray@develop~mpi~test~utils+shared~openmp~cuda", when="+dray~mpi~openmp~cuda+shared")
+
+    depends_on("dray@develop~mpi~test~utils~shared+cuda",        when="+dray~mpi+cuda~shared")
+    depends_on("dray@develop~mpi~test~utils~shared+openmp",      when="+dray~mpi+openmp~shared")
+    depends_on("dray@develop~mpi~test~utils~shared~openmp~cuda", when="+dray~mpi~openmp~cuda~shared")
+
 
     #######################
     # Documentation related
@@ -315,37 +342,6 @@ class Ascent(Package, CudaPackage):
         else:
             cfg.write(cmake_cache_entry("BUILD_SHARED_LIBS", "OFF"))
 
-        #######################################################################
-        # use global spack compiler flags
-        #######################################################################
-        cppflags = ' '.join(spec.compiler_flags['cppflags'])
-        if cppflags:
-            # avoid always ending up with ' ' with no flags defined
-            cppflags += ' '
-        cflags = cppflags + ' '.join(spec.compiler_flags['cflags'])
-        if cflags:
-            cfg.write(cmake_cache_entry("CMAKE_C_FLAGS", cflags))
-        cxxflags = cppflags + ' '.join(spec.compiler_flags['cxxflags'])
-        if cxxflags:
-            cfg.write(cmake_cache_entry("CMAKE_CXX_FLAGS", cxxflags))
-        fflags = ' '.join(spec.compiler_flags['fflags'])
-        if fflags:
-            cfg.write(cmake_cache_entry("CMAKE_Fortran_FLAGS", fflags))
-
-        # deal with rpath issues with clang + whatever fortran
-        if ((f_compiler is not None)
-           and ("clang" in cpp_compiler)):
-            libdir = os.path.join(os.path.dirname(
-                                  os.path.dirname(f_compiler.path)), "lib")
-            flags = ""
-            for _libpath in [libdir, libdir + "64"]:
-                if os.path.exists(_libpath):
-                    flags += " -Wl,-rpath,{0}".format(_libpath)
-            description = ("Adds a missing fortran rpath")
-            if flags:
-                cfg.write(cmake_cache_entry("BLT_EXE_LINKER_FLAGS", flags,
-                                            description))
-
         #######################
         # Unit Tests
         #######################
@@ -498,6 +494,15 @@ class Ascent(Package, CudaPackage):
             cfg.write(cmake_cache_entry("MFEM_DIR", spec['mfem'].prefix))
         else:
             cfg.write("# mfem not built by spack \n")
+
+        #######################
+        # Devil Ray
+        #######################
+        if "+dray" in spec:
+            cfg.write("# devil ray from spack \n")
+            cfg.write(cmake_cache_entry("DRAY_DIR", spec['dray'].prefix))
+        else:
+            cfg.write("# devil ray not built by spack \n")
 
         #######################
         # Adios
