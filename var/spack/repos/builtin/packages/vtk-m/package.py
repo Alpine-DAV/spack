@@ -148,9 +148,9 @@ class VtkM(CMakePackage, CudaPackage):
 
             # Support for for deprecated virtual functions
             if "+virtuals" in spec:
-                options.append("-DVTKm_NO_DEPRECATED_VIRTUAL:BOOL=ON")
-            else:
                 options.append("-DVTKm_NO_DEPRECATED_VIRTUAL:BOOL=OFF")
+            else:
+                options.append("-DVTKm_NO_DEPRECATED_VIRTUAL:BOOL=ON")
 
             # tbb support
             if "+tbb" in spec:
