@@ -40,6 +40,7 @@ class VtkH(Package, CudaPackage):
     maintainers = ['cyrush']
 
     version('develop', branch='develop', submodules=True)
+    version('0.6.9', sha256="80ecf41e737ff6c81fc103dac29d586101326a06d340f2621a3dbf060203b53e")
     version('0.6.8', sha256="0a37468ca65fdc12509b9fd53c74d5afb090630280e1161415d7377cad7d45f1")
     version('0.6.7', sha256="aff3ab94cf137fbc3019149363d5d8a39d052b02ecef42c6bf6d076e538af3f2")
     version('0.6.7', sha256="aff3ab94cf137fbc3019149363d5d8a39d052b02ecef42c6bf6d076e538af3f2")
