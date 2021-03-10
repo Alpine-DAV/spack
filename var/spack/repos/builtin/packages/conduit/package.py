@@ -206,10 +206,6 @@ class Conduit(CMakePackage):
             make("test")
 
     @run_after('install')
-    def install_cmake_cache(self):
-        install(self._get_host_config_path(self.spec), prefix)
-
-    @run_after('install')
     @on_package_attributes(run_tests=True)
     def check_install(self):
         """
@@ -254,10 +250,7 @@ class Conduit(CMakePackage):
         host_config_path = "%s-%s-%s-conduit.cmake" % (socket.gethostname(),
                                                        sys_type,
                                                        spec.compiler)
-        if "UBERENV_HOSTCONFIG_DEST_DIR" in os.environ.keys():
-            dest_dir = os.environ["UBERENV_HOSTCONFIG_DEST_DIR"]
-        else:
-            dest_dir = self.stage.source_path
+        dest_dir = spec.prefix
         host_config_path = os.path.abspath(join_path(dest_dir,
                                                      host_config_path))
         return host_config_path
@@ -270,7 +263,8 @@ class Conduit(CMakePackage):
         For more details about 'host-config' files see:
             http://software.llnl.gov/conduit/building.html
         """
-
+        if not os.path.isdir(spec.prefix):
+            os.mkdir(spec.prefix)
         py_site_pkgs_dir = None
         if "+python" in spec:
             py_site_pkgs_dir = site_packages_dir
