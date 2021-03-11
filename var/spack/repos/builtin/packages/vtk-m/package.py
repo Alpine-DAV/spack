@@ -22,7 +22,7 @@ class VtkM(CMakePackage, CudaPackage):
     git      = "https://gitlab.kitware.com/vtk/vtk-m.git"
 
     version('master', branch='master')
-    version('1.5.5', commit="eb682c79f210a2681fa754e4f94abb41f84b472a")
+    version('1.5.5', commit="d2d1c854adc8c0518802f153b48afd17646b6252")
     version('1.5.4', commit="bbba2a1967b271cc393abd043716d957bca97972")
     version('1.5.3', commit="a3b8525ef97d94996ae843db0dd4f675c38e8b1e")
     version('1.5.2', commit="c49390f2537c5ba8cf25bd39aa5c212d6eafcf61")
